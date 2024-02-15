@@ -11,7 +11,7 @@ https://github.com/fabenan-f/zeitquiz/assets/63860771/51475886-d2d5-4146-9929-b9
 Ensure that Go is installed on your system and build from source:
 
 ```
-go install github.com/fabenan-f/zeitquiz
+go install github.com/fabenan-f/zeitquiz@latest
 ```
 
 ## Usage
