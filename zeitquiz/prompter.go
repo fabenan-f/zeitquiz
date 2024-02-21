@@ -76,7 +76,6 @@ func PromptQuiz(quiz Quiz) (PlayerResult, error) {
 			PointScored: pointScored,
 			QuestionID:  question.ID,
 			TimeTaken:   1000,
-			TimingClass: "fast",
 		}
 		playerReturns = append(playerReturns, playerReturn)
 	}
@@ -84,5 +83,6 @@ func PromptQuiz(quiz Quiz) (PlayerResult, error) {
 	return PlayerResult{
 		Details:      playerReturns,
 		PointsScored: pointsScored,
+		TotalTime:    1000,
 	}, nil
 }

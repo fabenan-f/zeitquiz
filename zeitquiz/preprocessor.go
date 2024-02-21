@@ -2,7 +2,9 @@ package zeitquiz
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
+	"strconv"
 )
 
 func includeLineBreaks(question string) string {
@@ -37,11 +39,16 @@ func getCorrectAnswer(answers []Answer) string {
 	return ""
 }
 
-func EvaluateResult(pointsScored int, result Result) string {
-	return fmt.Sprintf("\n### Ergebnis \U0001F440 ###\n"+
+func EvaluateResult(pointsScored int, result Result) (string, error) {
+	meanPoints, err := strconv.ParseFloat(result.Stats.Average.MeanPoints, 64)
+	if err != nil {
+		log.Printf("Error %s when parsing mean points", err)
+		return "", err
+	}
+
+	return fmt.Sprintf("\nErgebnis \U0001F440\n"+
 		"Wow, du hast %d Punkte erreicht.\n"+
 		"Der Durchschnitt lag bei %.1f Punkten.\n"+
-		"\033[32mDamit bist du besser als %d%% der Spieler,\n"+
-		"\033[31mjedoch schlechter als %d%% der Spieler.\033[37m\n",
-		pointsScored, result.Stats.Average, result.Stats.BetterThan, result.Stats.WorseThan)
+		"%d Spieler haben teilgenommen.\n",
+		pointsScored, meanPoints, result.Stats.Average.TotalPlayed), nil
 }
