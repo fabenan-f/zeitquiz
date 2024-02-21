@@ -7,20 +7,25 @@ import (
 	"github.com/fabenan-f/zeitquiz/zeitquiz"
 )
 
-const banner string = "#######                   #######                                   #####                 \n     #  ###### # #####    #     # #    # #      # #    # ######    #     # #    # # ######\n    #   #      #   #      #     # ##   # #      # ##   # #         #     # #    # #     # \n   #    #####  #   #      #     # # #  # #      # # #  # #####     #     # #    # #    #  \n  #     #      #   #      #     # #  # # #      # #  # # #         #   # # #    # #   #   \n #      #      #   #      #     # #   ## #      # #   ## #         #    #  #    # #  #    \n####### ###### #   #      ####### #    # ###### # #    # ######     #### #  ####  # ######\n"
+const banner string = "#######                   #######                                   #####                 \n     #  ###### # #####    #     # #    # #      # #    # ######    #     # #    # # ######\n    #   #      #   #      #     # ##   # #      # ##   # #         #     # #    # #     # \n   #    #####  #   #      #     # # #  # #      # # #  # #####     #     # #    # #    #  \n  #     #      #   #      #     # #  # # #      # #  # # #         #   # # #    # #   #   \n #      #      #   #      #     # #   ## #      # #   ## #         #    #  #    # #  #    \n####### ###### #   #      ####### #    # ###### # #    # ######     #### #  ####  # ######"
 
 func main() {
-	fmt.Printf(banner)
+	fmt.Println(banner)
 
 	zeitClient := zeitquiz.NewZeitClient()
-	url := "https://quiz.zeit.de/-/quizzes/daily"
+	url := "https://quiz.zeit.de/quizzes/daily"
+	ids, err := zeitClient.GetQuizIds(url)
+	if err != nil {
+		return
+	}
 
-	for {
+	for _, id := range ids {
 		ok := zeitquiz.PromptReady()
 		if !ok {
 			return
 		}
-		quiz, err := zeitClient.GetQuiz(url)
+		quizUrl := "https://quiz.zeit.de/states?quizId=" + strconv.Itoa(id)
+		quiz, err := zeitClient.GetQuiz(quizUrl)
 		if err != nil {
 			return
 		}
@@ -29,14 +34,17 @@ func main() {
 		if err != nil {
 			return
 		}
-		resultUrl := "https://quiz.zeit.de/-/quiz/" + strconv.Itoa(quiz.ID) + "/result"
+		resultUrl := "https://quiz.zeit.de/results?quizId=" + strconv.Itoa(quiz.ID)
 		result, err := zeitClient.PostPlayerResult(playerResult, resultUrl)
 		if err != nil {
 			return
 		}
 
-		fmt.Println(zeitquiz.EvaluateResult(playerResult.PointsScored, result))
+		evaluation, err := zeitquiz.EvaluateResult(playerResult.PointsScored, result)
+		if err != nil {
+			return
+		}
 
-		url = result.NextQuiz
+		fmt.Println(evaluation)
 	}
 }

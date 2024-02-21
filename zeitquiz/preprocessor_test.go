@@ -51,16 +51,17 @@ func TestGetCorrectAnswer(t *testing.T) {
 func TestEvaluateResult(t *testing.T) {
 	givenPoints := 6
 	givenResult := Result{
-		NextQuiz: "some url",
 		Stats: Stats{
-			Average:    5.5,
-			WorseThan:  20,
-			BetterThan: 80,
+			Average: Average{
+				MeanPoints:  "5.5",
+				MeanTime:    "3000",
+				TotalPlayed: 300,
+			},
 		},
 	}
 
-	want := "\n### Ergebnis 👀 ###\nWow, du hast 6 Punkte erreicht.\nDer Durchschnitt lag bei 5.5 Punkten.\n\x1b[32mDamit bist du besser als 80% der Spieler,\n\x1b[31mjedoch schlechter als 20% der Spieler.\x1b[37m\n"
-	got := EvaluateResult(givenPoints, givenResult)
+	want := "\nErgebnis 👀\nWow, du hast 6 Punkte erreicht.\nDer Durchschnitt lag bei 5.5 Punkten.\n300 Spieler haben teilgenommen.\n"
+	got, _ := EvaluateResult(givenPoints, givenResult)
 	if want != got {
 		t.Fatalf("Got %s, not want %s", got, want)
 	}
