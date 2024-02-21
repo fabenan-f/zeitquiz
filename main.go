@@ -35,7 +35,7 @@ func main() {
 			return
 		}
 		resultUrl := "https://quiz.zeit.de/results?quizId=" + strconv.Itoa(quiz.ID)
-		result, err := zeitClient.PostPlayerResult(playerResult, resultUrl)
+		result, err := zeitClient.PostPlayerResult(playerResult, resultUrl, "")
 		if err != nil {
 			return
 		}

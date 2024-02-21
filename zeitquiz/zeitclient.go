@@ -65,7 +65,13 @@ type Average struct {
 }
 
 type Result struct {
-	Stats Stats `json:"stats"`
+	Stats Stats  `json:"stats"`
+	UUID  string `json:"uuid"`
+}
+
+type Ranking struct {
+	Name       string `json:"name"`
+	ResultUUID string `json:"resultUUID"`
 }
 
 func NewZeitClient() ZeitClient {
@@ -144,7 +150,7 @@ func (z *ZeitClient) GetQuiz(url string) (Quiz, error) {
 	return quizOverview.Quiz, nil
 }
 
-func (z *ZeitClient) PostPlayerResult(playerResult PlayerResult, url string) (Result, error) {
+func (z *ZeitClient) PostPlayerResult(playerResult PlayerResult, url string, cookies string) (Result, error) {
 	playerResultJson, err := json.Marshal(playerResult)
 	if err != nil {
 		log.Printf("Error %s when marshalling result", err)
@@ -158,6 +164,7 @@ func (z *ZeitClient) PostPlayerResult(playerResult PlayerResult, url string) (Re
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Cookie", cookies)
 
 	res, err := z.http.Do(req)
 	if err != nil {
@@ -180,4 +187,29 @@ func (z *ZeitClient) PostPlayerResult(playerResult PlayerResult, url string) (Re
 	}
 
 	return result, nil
+}
+
+func (z *ZeitClient) PostRanking(ranking Ranking, url, cookies string) (string, error) {
+	rankingJson, err := json.Marshal(ranking)
+	if err != nil {
+		log.Printf("Error %s when marshaling ranking request", err)
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(rankingJson))
+	if err != nil {
+		log.Printf("Error %s when creating ranking request", err)
+		return "", err
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Cookie", cookies)
+
+	res, err := z.http.Do(req)
+	if err != nil {
+		log.Printf("Error %s when posting results", err)
+		return "", err
+	}
+
+	return res.Status, nil
 }
